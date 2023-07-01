@@ -35,6 +35,17 @@ module.exports = {
           'style-loader', 'css-loader', 'sass-loader'
         ],
       },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: { // babel options
+            presets: ['@babel/env'],
+            plugins: ['@babel/plugin-proposal-class-properties']
+          }
+        }
+      }
     ],
   },
 }
