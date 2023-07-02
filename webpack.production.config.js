@@ -4,9 +4,12 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    'hello-world': './src/hello-world.js',
+    'kiwi': './src/kiwi.js'
+  },
   output: {
-    filename: 'bundle.[contenthash].js',
+    filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, './dist'),
     publicPath: '',
   },
@@ -14,7 +17,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(png|jpg)$/,
+        test: /\.(png|jpg|jpeg)$/,
         type: 'asset',
         parser: {
           dataUrlCondition: {
@@ -59,13 +62,24 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'styles.[contenthash].css'
+      filename: '[name].[contenthash].css'
     }),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
+      filename: 'hello-world.html',
       title: 'Hello World',
-      template: 'src/index.hbs',
-      description: 'Some description'
+      template: 'src/page-template.hbs',
+      description: 'Hello world',
+      minify: false,
+      chunks: ['hello-world']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'kiwi.html',
+      title: 'Kiwi',
+      template: 'src/page-template.hbs',
+      description: 'Kiwi',
+      minify: false,
+      chunks: ['kiwi']
     })
   ],
 }
