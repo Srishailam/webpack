@@ -1,4 +1,3 @@
-import React from 'react';
 import Heading from './components/heading/heading.js';
 import KiwiImage from './components/kiwi-image/kiwi-image.js';
 
