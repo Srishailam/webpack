@@ -1,23 +1,24 @@
 const path = require('path')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { ModuleFederationPlugin } = require('webpack').container;
 
 module.exports = {
-  entry: {
-    'hello-world': './src/hello-world.js',
-    'kiwi': './src/kiwi.js'
-  },
+  entry: './src/kiwi.js',
   output: {
-    filename: '[name].[contenthash].js',
+    filename: '[name].bundle.js',
     path: path.resolve(__dirname, './dist'),
-    publicPath: '/static/',
+    publicPath: 'http://localhost:9002/',
   },
-  mode: 'production',
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      minSize: 3000
+  mode: 'development',
+  devServer: {
+    port: 9002,
+    static: {
+      directory: path.resolve(__dirname, './dist'),
+    },
+    devMiddleware: {
+      index: 'kiwi.html',
+      writeToDisk: true
     },
   },
   module: {
@@ -36,15 +37,9 @@ module.exports = {
         type: 'asset/source'
       },
       {
-        test: /\.css$/,
-        use: [
-          MiniCssExtractPlugin.loader, 'css-loader'
-        ]
-      },
-      {
         test: /\.scss$/,
         use: [
-          MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'
+          'style-loader', 'css-loader', 'sass-loader'
         ],
       },
       {
@@ -54,7 +49,6 @@ module.exports = {
           loader: 'babel-loader',
           options: { // babel options
             presets: ['@babel/env'],
-            plugins: ['@babel/plugin-proposal-class-properties']
           }
         }
       },
@@ -67,25 +61,19 @@ module.exports = {
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: '[name].[contenthash].css'
-    }),
     new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin({
-      filename: 'hello-world.html',
-      title: 'Hello World',
-      template: 'src/page-template.hbs',
-      description: 'Hello world',
-      minify: false,
-      chunks: ['hello-world']
-    }),
     new HtmlWebpackPlugin({
       filename: 'kiwi.html',
       title: 'Kiwi',
       template: 'src/page-template.hbs',
       description: 'Kiwi',
-      minify: false,
-      chunks: ['kiwi']
-    })
+    }),
+    new ModuleFederationPlugin({
+      name: 'KiwiApp',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './KiwiPage': './src/components/kiwi-page/kiwi-page.js',
+      },
+    }),
   ],
 }
